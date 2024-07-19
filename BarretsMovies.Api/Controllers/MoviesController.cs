@@ -17,7 +17,6 @@ namespace BarretsMovies.Api.Controllers
             _dataService = dataService;
         }
 
-
         // GET: api/<MoviesController>
         [HttpGet]
         public MovieResult Get(int? page, int? limit, string? search, string? genre, string? writer, string? director, string? actor, string? rating)
@@ -28,7 +27,7 @@ namespace BarretsMovies.Api.Controllers
                 .Where(x => string.IsNullOrEmpty(writer) || x.Writers.Contains(writer))
                 .Where(x => string.IsNullOrEmpty(director) || x.Directors.Contains(director))
                 .Where(x => string.IsNullOrEmpty(actor) || x.MainActors.Contains(actor))
-                .Where(x => string.IsNullOrEmpty(rating) || x.Rating.Equals(rating))
+                .Where(x => string.IsNullOrEmpty(rating) || (x.Rating != null && x.Rating.Equals(rating)))
                 .Count();
 
             var subset = _dataService.Movies
@@ -37,7 +36,7 @@ namespace BarretsMovies.Api.Controllers
                 .Where(x => string.IsNullOrEmpty(writer) || x.Writers.Contains(writer))
                 .Where(x => string.IsNullOrEmpty(director) || x.Directors.Contains(director))
                 .Where(x => string.IsNullOrEmpty(actor) || x.MainActors.Contains(actor))
-                .Where(x => string.IsNullOrEmpty(rating) || x.Rating.Equals(rating))
+                .Where(x => string.IsNullOrEmpty(rating) || (x.Rating != null && x.Rating.Equals(rating)))
                 .Skip((page ?? 0) * (limit ?? 25))
                 .Take(limit ?? 25);
 
@@ -75,6 +74,13 @@ namespace BarretsMovies.Api.Controllers
             return _dataService.Movies.FirstOrDefault(x => x.Id.Equals(id));
         }
 
-
-}
+        [HttpGet("/ratings")]
+        public List<string> GetRatings()
+        {
+            return _dataService.Movies
+                .Select(x => x.Rating)
+                .Distinct()
+                .ToList();
+        }
+    }
 }

@@ -9,7 +9,7 @@ I created that other repo first, then decided to create a .NET back end. Include
 * Update the API to store the movies in a database instead of in memory
 * Make the API multi-user, with appropriate security/auth, so that each user can have their own ratings and the ratings of all users can be averaged together
 * Store movie poster images locally instead of stealing them from another source
-* Admin portal to add new movies
+* Admin portal to add new movies and update existing movies
 * Allow users to add reviews, not just a rating score
 
 ## Running the app

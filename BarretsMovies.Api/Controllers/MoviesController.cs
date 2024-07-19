@@ -88,5 +88,15 @@ namespace BarretsMovies.Api.Controllers
                 .Distinct()
                 .ToList();
         }
+
+        [HttpPut("{id}/{rating}")]
+        public void RateMovie(Guid id, int rating)
+        {
+            var movie = _dataService.Movies.FirstOrDefault(x => x.Id.Equals(id));
+            if (movie != null)
+            {
+                movie.UserRating = rating;
+            }
+        }
     }
 }

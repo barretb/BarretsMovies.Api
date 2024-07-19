@@ -15,6 +15,7 @@ export class Movie{
     public worstRating: number;
     public writers: string[];
     public genres: string[];
+    public userRating: number | null;
 
     constructor(){
         this.id = "";
@@ -31,5 +32,6 @@ export class Movie{
         this.worstRating = 0.0;
         this.writers = [""];
         this.genres = [];
+        this.userRating = null;
     }
 }

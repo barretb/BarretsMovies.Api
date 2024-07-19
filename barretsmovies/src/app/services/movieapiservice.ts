@@ -157,4 +157,11 @@ export class MovieApiService {
         this.ratings = result.data;
       })
   }
+
+  rateMovie(id: string, rating: number){
+    this.service.put('/movies/' + id + '/' + rating)
+    .then((result)=>{
+      //nothing now. But in the future, refresh the movie and it's rating based on all user ratings
+    })
+  }
 }

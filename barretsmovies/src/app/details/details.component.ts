@@ -22,37 +22,47 @@ export class DetailsComponent {
     {
       value: 0,
       text: 'Not Rated',
-    },{
+    },
+    {
       value: 1,
       text: '1',
-    },{
+    },
+    {
       value: 2,
       text: '2',
-    },{
+    },
+    {
       value: 3,
       text: '3',
-    },{
+    },
+    {
       value: 4,
       text: '4',
-    },{
+    },
+    {
       value: 5,
       text: '5',
-    },{
+    },
+    {
       value: 6,
       text: '6',
-    },{
+    },
+    {
       value: 7,
       text: '7',
-    },{
+    },
+    {
       value: 8,
       text: '8',
-    },{
+    },
+    {
       value: 9,
       text: '9',
-    },{
+    },
+    {
       value: 10,
       text: '10',
-    }
+    },
   ];
 
   constructor(
@@ -65,8 +75,11 @@ export class DetailsComponent {
     this.movieDetails = new Movie();
     movieApiService.getMovieDetails(this.selectedMovieId).then((result) => {
       this.movieDetails = result;
+      if (result.userRating !== null) {
+        this.myRating = result.userRating;
+      }
     });
-    this.getMyRating();
+    //this.getMyRating();
   }
 
   loadGenre(genreName: string) {
@@ -75,11 +88,11 @@ export class DetailsComponent {
     this.router.navigate(['']);
   }
 
-  getMyRating() {
-    this.myRating = this.userRatingService.getRating(this.selectedMovieId);
-  }
+  //getMyRating() {
+  //  this.myRating = this.userRatingService.getRating(this.selectedMovieId);
+  //}
 
   setMyRating(event: any) {
-    this.userRatingService.setRating(this.selectedMovieId, this.myRating);
+    this.movieApiService.rateMovie(this.selectedMovieId, this.myRating);
   }
 }

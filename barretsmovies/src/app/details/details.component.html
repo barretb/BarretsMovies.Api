@@ -4,8 +4,8 @@
 <img src="{{movieDetails.posterUrl}}" class="details-poster" />
 <p class="details-title">{{movieDetails.title}}</p>
 <div>
-    <span class="details-genre" *ngFor="let genre of movieDetails.genres" (click)="loadGenre(genre.title)">
-        {{genre.title}}
+    <span class="details-genre" *ngFor="let genre of movieDetails.genres" (click)="loadGenre(genre)">
+        {{genre}}
     </span>
 </div>
 <div style="margin-top: 25px;">

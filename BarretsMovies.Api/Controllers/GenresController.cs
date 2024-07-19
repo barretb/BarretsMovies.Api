@@ -17,11 +17,15 @@ namespace BarretsMovies.Api.Controllers
             _dataService = dataService;
         }
 
-        [HttpGet("/movies")]
+        [HttpGet("movies")]
         public List<Genre> GetMovies(int? page, int? limit)
         {
+            var pageCount = 0;
+            if(page != 0) pageCount = page.Value - 1;
+
             return _dataService.Genres
-                .Skip((page ?? 0) * (limit??25))
+                .OrderBy(x => x.Title)
+                .Skip(pageCount * (limit??25))
                 .Take(limit??25)
                 .ToList();
         }

@@ -14,7 +14,7 @@ export class Movie{
     public bestRating: number;
     public worstRating: number;
     public writers: string[];
-    public genres: Genre[];
+    public genres: string[];
 
     constructor(){
         this.id = "";

@@ -1,6 +1,7 @@
 ﻿using BarretsMovies.Api.Models;
 using BarretsMovies.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -21,23 +22,27 @@ namespace BarretsMovies.Api.Controllers
         [HttpGet]
         public MovieResult Get(int? page, int? limit, string? search, string? genre, string? writer, string? director, string? actor, string? rating)
         {
+            var pageCount = 0;
+            if (page != null) pageCount = page.Value - 1;
+
             var resultcount = _dataService.Movies
                 .Where(x => string.IsNullOrEmpty(search) || x.Title.Contains(search))
-                .Where(x => string.IsNullOrEmpty(genre) || x.Genres.Contains(genre))
-                .Where(x => string.IsNullOrEmpty(writer) || x.Writers.Contains(writer))
-                .Where(x => string.IsNullOrEmpty(director) || x.Directors.Contains(director))
-                .Where(x => string.IsNullOrEmpty(actor) || x.MainActors.Contains(actor))
+                .Where(x => string.IsNullOrEmpty(genre) || (x.Genres != null && x.Genres.Any(x => x.Contains(genre, StringComparison.InvariantCultureIgnoreCase))))
+                .Where(x => string.IsNullOrEmpty(writer) || (x.Writers != null && x.Writers.Any(x => x.Contains(writer, StringComparison.InvariantCultureIgnoreCase))))
+                .Where(x => string.IsNullOrEmpty(director) || (x.Directors != null && x.Directors.Any(x => x.Contains(director, StringComparison.InvariantCultureIgnoreCase))))
+                .Where(x => string.IsNullOrEmpty(actor) || (x.MainActors != null && x.MainActors.Any(x => x.Contains(actor, StringComparison.InvariantCultureIgnoreCase))))
                 .Where(x => string.IsNullOrEmpty(rating) || (x.Rating != null && x.Rating.Equals(rating)))
                 .Count();
 
             var subset = _dataService.Movies
                 .Where(x => string.IsNullOrEmpty(search) || x.Title.Contains(search))
-                .Where(x => string.IsNullOrEmpty(genre) || x.Genres.Contains(genre))
-                .Where(x => string.IsNullOrEmpty(writer) || x.Writers.Contains(writer))
-                .Where(x => string.IsNullOrEmpty(director) || x.Directors.Contains(director))
-                .Where(x => string.IsNullOrEmpty(actor) || x.MainActors.Contains(actor))
+                .Where(x => string.IsNullOrEmpty(genre) || (x.Genres != null && x.Genres.Any(x=>x.Contains(genre, StringComparison.InvariantCultureIgnoreCase))))
+                .Where(x => string.IsNullOrEmpty(writer) || (x.Writers != null && x.Writers.Any(x=>x.Contains(writer, StringComparison.InvariantCultureIgnoreCase))))
+                .Where(x => string.IsNullOrEmpty(director) || (x.Directors != null && x.Directors.Any(x=>x.Contains(director, StringComparison.InvariantCultureIgnoreCase))))
+                .Where(x => string.IsNullOrEmpty(actor) || (x.MainActors != null && x.MainActors.Any(x=>x.Contains(actor, StringComparison.InvariantCultureIgnoreCase))))
                 .Where(x => string.IsNullOrEmpty(rating) || (x.Rating != null && x.Rating.Equals(rating)))
-                .Skip((page ?? 0) * (limit ?? 25))
+                .OrderBy(x => x.Title)
+                .Skip(pageCount * (limit ?? 25))
                 .Take(limit ?? 25);
 
             return new MovieResult()
@@ -54,10 +59,11 @@ namespace BarretsMovies.Api.Controllers
         {
             return _dataService.Movies.FirstOrDefault(x => x.Id.Equals(id));
         }
-        [HttpGet("/titles")]
+        [HttpGet("titles")]
         public List<Movie> GetIdsAndTitles(int? page, int? limit)
         {
             return _dataService.Movies
+                .OrderBy(x => x.Title)
                  .Skip((page ?? 0) * (limit ?? 25))
                  .Take(limit ?? 25)
                  .Select(x => new Movie()
@@ -68,13 +74,13 @@ namespace BarretsMovies.Api.Controllers
                  .ToList();
         }
 
-        [HttpGet("/genres/{id}")]
+        [HttpGet("genres/{id}")]
         public Movie GetGenresDetails(Guid id)
         {
             return _dataService.Movies.FirstOrDefault(x => x.Id.Equals(id));
         }
 
-        [HttpGet("/ratings")]
+        [HttpGet("ratings")]
         public List<string> GetRatings()
         {
             return _dataService.Movies

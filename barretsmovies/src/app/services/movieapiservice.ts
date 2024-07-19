@@ -7,8 +7,9 @@ import { Movie } from '../models/movie';
 import { GenreStats } from '../models/genrestats';
 
 export interface MoviesResponse {
-  data: Movie[];
+  movies: Movie[];
   totalPages: number;
+  totalResults: number;
 }
 
 export interface MoviesByGenreResponse {
@@ -29,11 +30,15 @@ export class MovieApiService {
   public totalResults: number;
   public currentGenre: string | null;
   public currentTitleFilter: string | null;
+  public currentActorFilter: string | null;
+  public currentDirectorFilter: string | null;
+  public currentWriterFilter: string | null;
   public genres: Genre[];
-  
+  public ratings: string[];
+  public mpaaRating: string | null = null;
 
   constructor() {
-    const baseUrl = 'https://0kadddxyh3.execute-api.us-east-1.amazonaws.com';
+    const baseUrl = 'http://localhost:5279/api';
     const token = window.localStorage.getItem('token');
     const service = axios.create({
       baseURL: baseUrl,
@@ -53,7 +58,11 @@ export class MovieApiService {
     this.totalResults = 0;
     this.currentGenre = null;
     this.currentTitleFilter = null;
+    this.currentActorFilter = null;
+    this.currentDirectorFilter = null;
+    this.currentWriterFilter = null;
     this.genres = [];
+    this.ratings = [];
   }
 
   handleSuccess(response: AxiosResponse) {
@@ -82,40 +91,26 @@ export class MovieApiService {
   }
 
   getMovies(page: number | null) {
-    if (page === null || page <= 0) page = 1;
+    if (page === null || page <= 0) page = 1;    
 
     this.service
       .get<MoviesResponse>('/movies', {
         params: {
           page,
-          limit : this.pageSize,
-          search : this.currentTitleFilter,
-          genre : this.currentGenre,
+          limit: this.pageSize,
+          search: this.currentTitleFilter,
+          genre: this.currentGenre,
+          writer: this.currentWriterFilter,
+          director: this.currentDirectorFilter,
+          actor: this.currentActorFilter,
+          rating: this.mpaaRating,
         },
       })
       .then((response) => {
         this.currentPage = page;
         this.totalPages = response.data.totalPages;
-        this.movies = response.data.data;
-
-        if (this.totalPages > 1) {
-          //kludge fix total results count
-          this.service
-            .get<MoviesResponse>('/movies', {
-              params: {
-                page: this.totalPages,
-                limit : this.pageSize,
-                search : this.currentTitleFilter,
-                genre : this.currentGenre,
-              },
-            })
-            .then((countResponse) => {
-              this.totalResults =
-                countResponse.data.data.length + (this.totalPages - 1) * this.pageSize;
-            });
-        } else {
-          this.totalResults = response.data.data.length;
-        }
+        this.movies = response.data.movies;
+        this.totalResults = response.data.totalResults;
       });
   }
 
@@ -124,20 +119,14 @@ export class MovieApiService {
     if (limit === null || limit <= 0) limit = 25;
 
     this.service
-      .get<MoviesByGenreResponse>('/genres/movies', {
+      .get<Genre[]>('/genres/movies', {
         params: {
           page,
           limit,
         },
       })
       .then((response) => {
-        this.genres = response.data.data;
-        this.genres.forEach(element => {
-          this.service.get<GenreStats>('/movies/genres/' + element.id)
-            .then((result)=>{
-              element.totalMovies = result.data.totalMovies;
-            })
-        });
+        this.genres = response.data;        
       });
   }
 
@@ -153,12 +142,19 @@ export class MovieApiService {
     this.getMovies(null);
   }
 
-  changePageSize(newSize: number | null){
-    if(newSize === null){
+  changePageSize(newSize: number | null) {
+    if (newSize === null) {
       this.pageSize = 25;
     } else {
       this.pageSize = newSize;
     }
     this.getMovies(null);
+  }
+
+  getRatings(){
+    this.service.get<string[]>('/movies/ratings')
+      .then((result)=>{
+        this.ratings = result.data;
+      })
   }
 }

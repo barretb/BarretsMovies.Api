@@ -1,24 +1,74 @@
 <div class="content">
   <div class="left-side">
-    <p>You can search by title and/or browse by genre</p>
+    <p>Filters</p>
     <section id="filters">
-      <div style="float: right">
-        <input
-          type="text"
-          id="title-search"
-          [(ngModel)]="searchText"
-          (input)="search()"
-          placeholder="Type title to search"
-        />
-      </div>
       <div *ngIf="movieApiService.currentGenre !== null">
         Filtered by {{ movieApiService.currentGenre }}
       </div>
+      <br />
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Actor</th>
+            <th>Director</th>
+            <th>Writer</th>
+            <th>MPAA Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <input
+                type="text"
+                id="title-search"
+                [(ngModel)]="titleText"
+                (input)="searchTitle()"
+                placeholder="Type title to search"
+              />
+            </td>
+            <td>
+              <input
+                type="text"
+                id="actor-search"
+                [(ngModel)]="actorText"
+                (input)="searchActor()"
+                placeholder="Type actor name to search"
+              />
+            </td>
+            <td>
+              <input
+                type="text"
+                id="director-search"
+                [(ngModel)]="directorText"
+                (input)="searchDirector()"
+                placeholder="Type director name to search"
+              />
+            </td>
+            <td>
+              <input
+                type="text"
+                id="writer-search"
+                [(ngModel)]="writerText"
+                (input)="searchWriter()"
+                placeholder="Type writer name to search"
+              />
+            </td>
+            <td>
+              <select [(ngModel)]="mpaaRating" (change)="ratingChange($event)">
+                <option value="Any" selected>Any</option>
+                <option *ngFor="let r of mpaaRatings" [ngValue]="r">{{r}}</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </section>
     <section id="help">
-      <div style="float:right">
-        Page Size: <select [(ngModel)]="pageSize" (change)="pageSizeChange($event)">
-          <option *ngFor="let p of pageSizes" [ngValue]="p">{{p}}</option>
+      <div style="float: right">
+        Page Size:
+        <select [(ngModel)]="pageSize" (change)="pageSizeChange($event)">
+          <option *ngFor="let p of pageSizes" [ngValue]="p">{{ p }}</option>
         </select>
       </div>
       <p>Click on a movie to see details</p>
